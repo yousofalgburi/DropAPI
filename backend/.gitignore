@@ -1,2 +1,9 @@
-appsettings.json
+# Compiled binary and intermediate files
+bin/
 obj/
+
+# Local development app settings file
+appsettings.Development.json
+
+# Since you're excluding appsettings.json in your previous screenshot
+appsettings.json
