@@ -1,4 +1,3 @@
-using DropAPI.Models;
 using DropAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +13,11 @@ public class APIController : ControllerBase
         _apisService = apisService;
 
     [HttpGet]
-    public async Task<List<API>> Get() =>
+    public async Task<List<ApiApp>> Get() =>
         await _apisService.GetAsync();
 
     [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<API>> Get(string id)
+    public async Task<ActionResult<ApiApp>> Get(string id)
     {
         var api = await _apisService.GetAsync(id);
 
@@ -31,7 +30,7 @@ public class APIController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(API newAPI)
+    public async Task<IActionResult> Post(ApiApp newAPI)
     {
         await _apisService.CreateAsync(newAPI);
 
@@ -39,7 +38,7 @@ public class APIController : ControllerBase
     }
 
     [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, API updatedAPI)
+    public async Task<IActionResult> Update(string id, ApiApp updatedAPI)
     {
         var api = await _apisService.GetAsync(id);
 
