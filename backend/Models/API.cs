@@ -12,7 +12,7 @@ public class API
     [BsonElement("Name")]
     public string Name { get; set; } = null!;
 
-    public decimal Description { get; set; }
+    public string Description { get; set; } = null!;
 
     public string OwnerID { get; set; } = null!;
 }
