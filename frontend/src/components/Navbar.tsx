@@ -3,7 +3,7 @@ import { ModeToggle } from './ModeToggle'
 import { UserAccountNav } from './UserAccountNav'
 
 export default function Navbar() {
-	const { isAuthenticated, user, loginWithPopup } = useAuth0()
+	const { isAuthenticated, user, loginWithRedirect } = useAuth0()
 
 	return (
 		<header className='flex h-14 items-center px-4 lg:px-6'>
@@ -28,7 +28,7 @@ export default function Navbar() {
 						}}
 					/>
 				) : (
-					<button onClick={() => loginWithPopup()}>Log in</button>
+					<button onClick={() => loginWithRedirect()}>Log in</button>
 				)}
 			</nav>
 		</header>
