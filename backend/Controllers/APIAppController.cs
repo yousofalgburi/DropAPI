@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DropAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,49 +11,41 @@ public class APIAppController : ControllerBase
 {
     private readonly APIAppService _apiAppService;
 
-    public APIAppController(APIAppService apiAppService) =>
-        _apiAppService = apiAppService;
+    public APIAppController(APIAppService apiAppService) => _apiAppService = apiAppService;
 
     [HttpGet]
     [Authorize]
-    public async Task<List<ApiApp>> Get() => await _apiAppService.GetAsync();
-
-    [HttpGet("{id:length(24)}")]
-    public async Task<ActionResult<ApiApp>> Get(string id)
+    public async Task<List<ApiApp>> Get()
     {
-        var api = await _apiAppService.GetAsync(id);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
-        if (api is null)
+        if (string.IsNullOrEmpty(userId))
         {
-            return NotFound();
+            Unauthorized("User ID is required.");
+            return [];
         }
 
-        return api;
+        var userApis = await _apiAppService.GetAsync(userId);
+
+        return userApis;
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Post(ApiApp newAPI)
     {
-        await _apiAppService.CreateAsync(newAPI);
+        string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
-        return CreatedAtAction(nameof(Get), new { id = newAPI.Id }, newAPI);
-    }
-
-    [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> Update(string id, ApiApp updatedAPI)
-    {
-        var api = await _apiAppService.GetAsync(id);
-
-        if (api is null)
+        ApiApp newAPIAuthorized = new()
         {
-            return NotFound();
-        }
+            UserId = userId,
+            Name = newAPI.Name,
+            Description = newAPI.Description,
+        };
 
-        updatedAPI.Id = api.Id;
+        await _apiAppService.CreateAsync(newAPIAuthorized);
 
-        await _apiAppService.UpdateAsync(id, updatedAPI);
-
-        return NoContent();
+        return CreatedAtAction(nameof(Get), new { id = newAPIAuthorized.Id }, newAPIAuthorized);
     }
 
     [HttpDelete("{id:length(24)}")]

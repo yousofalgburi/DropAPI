@@ -34,6 +34,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("read:apiapp", policy => policy.Requirements.Add(new HasScopeRequirement("read:apiapp", domain)));
+    options.AddPolicy("write:apiapp", policy => policy.Requirements.Add(new HasScopeRequirement("write:apiapp", domain)));
 });
 
 builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();

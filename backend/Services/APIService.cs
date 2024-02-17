@@ -15,11 +15,8 @@ public class APIAppService
         _apisCollection = mongoDatabase.GetCollection<ApiApp>(apiStoreDatabaseSettings.Value.ApisCollectionName);
     }
 
-    public async Task<List<ApiApp>> GetAsync() =>
-        await _apisCollection.Find(_ => true).ToListAsync();
-
-    public async Task<ApiApp?> GetAsync(string id) =>
-        await _apisCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+    public async Task<List<ApiApp>> GetAsync(string userId) =>
+        await _apisCollection.Find(x => x.UserId == userId).ToListAsync();
 
     public async Task CreateAsync(ApiApp newAPI) =>
         await _apisCollection.InsertOneAsync(newAPI);
