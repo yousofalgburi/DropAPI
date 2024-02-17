@@ -4,11 +4,11 @@ using MongoDB.Driver;
 
 namespace DropAPI.Services;
 
-public class APIService
+public class APIAppService
 {
     private readonly IMongoCollection<ApiApp> _apisCollection;
 
-    public APIService(IOptions<DropAPIDatabaseSettings> apiStoreDatabaseSettings)
+    public APIAppService(IOptions<DropAPIDatabaseSettings> apiStoreDatabaseSettings)
     {
         var mongoClient = new MongoClient(apiStoreDatabaseSettings.Value.ConnectionString);
         var mongoDatabase = mongoClient.GetDatabase(apiStoreDatabaseSettings.Value.DatabaseName);

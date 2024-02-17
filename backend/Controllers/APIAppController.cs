@@ -1,25 +1,26 @@
 using DropAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DropAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class APIController : ControllerBase
+public class APIAppController : ControllerBase
 {
-    private readonly APIService _apisService;
+    private readonly APIAppService _apiAppService;
 
-    public APIController(APIService apisService) =>
-        _apisService = apisService;
+    public APIAppController(APIAppService apiAppService) =>
+        _apiAppService = apiAppService;
 
     [HttpGet]
-    public async Task<List<ApiApp>> Get() =>
-        await _apisService.GetAsync();
+    [Authorize]
+    public async Task<List<ApiApp>> Get() => await _apiAppService.GetAsync();
 
     [HttpGet("{id:length(24)}")]
     public async Task<ActionResult<ApiApp>> Get(string id)
     {
-        var api = await _apisService.GetAsync(id);
+        var api = await _apiAppService.GetAsync(id);
 
         if (api is null)
         {
@@ -32,7 +33,7 @@ public class APIController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post(ApiApp newAPI)
     {
-        await _apisService.CreateAsync(newAPI);
+        await _apiAppService.CreateAsync(newAPI);
 
         return CreatedAtAction(nameof(Get), new { id = newAPI.Id }, newAPI);
     }
@@ -40,7 +41,7 @@ public class APIController : ControllerBase
     [HttpPut("{id:length(24)}")]
     public async Task<IActionResult> Update(string id, ApiApp updatedAPI)
     {
-        var api = await _apisService.GetAsync(id);
+        var api = await _apiAppService.GetAsync(id);
 
         if (api is null)
         {
@@ -49,7 +50,7 @@ public class APIController : ControllerBase
 
         updatedAPI.Id = api.Id;
 
-        await _apisService.UpdateAsync(id, updatedAPI);
+        await _apiAppService.UpdateAsync(id, updatedAPI);
 
         return NoContent();
     }
@@ -57,14 +58,14 @@ public class APIController : ControllerBase
     [HttpDelete("{id:length(24)}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var api = await _apisService.GetAsync(id);
+        var api = await _apiAppService.GetAsync(id);
 
         if (api is null)
         {
             return NotFound();
         }
 
-        await _apisService.RemoveAsync(id);
+        await _apiAppService.RemoveAsync(id);
 
         return NoContent();
     }

@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button'
-import ApiCard from './components/ApiCards'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useEffect } from 'react'
+import APICard from './components/APICard'
 import Navbar from './components/Navbar'
 import { ThemeProvider } from './components/theme-provider'
 
@@ -18,7 +20,25 @@ const exampleApis = [
 	},
 ]
 
-function App() {
+export default function App() {
+	const { getAccessTokenSilently } = useAuth0()
+
+	useEffect(() => {
+		async function fetchData() {
+			const token = await getAccessTokenSilently()
+
+			const response = await fetch('https://localhost:7115/api/apiapp', {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+			const data = await response.json()
+			console.log(data)
+		}
+
+		fetchData()
+	}, [getAccessTokenSilently])
+
 	return (
 		<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
 			<Navbar />
@@ -32,12 +52,10 @@ function App() {
 
 				<div className='flex flex-wrap gap-4'>
 					{exampleApis.map((card, index) => (
-						<ApiCard key={index} apiDetails={card} />
+						<APICard key={index} apiDetails={card} />
 					))}
 				</div>
 			</main>
 		</ThemeProvider>
 	)
 }
-
-export default App
