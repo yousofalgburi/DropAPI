@@ -1,5 +1,6 @@
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
@@ -18,23 +19,36 @@ import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
 
 export default function App() {
-	const [apiApps, setApiApps] = useState<{ name: string; description: string }[]>([])
-	const [name, setName] = useState('')
-	const [description, setDescription] = useState('')
 	const { getAccessTokenSilently } = useAuth0()
+
+	const [apiApps, setApiApps] = useState<{ name: string; description: string }[]>([])
+	const [formData, setFormData] = useState({
+		name: '',
+		description: '',
+	})
 
 	const { mutate: addNew } = useMutation({
 		mutationFn: async ({ name, description }: { name: string; description: string }) => {
 			const token = await getAccessTokenSilently()
 
-			await fetch('https://localhost:7115/api/apiapp', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify({ name, description, UserID: '' }),
-			})
+			try {
+				const res = await fetch('https://localhost:7115/api/apiapp', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({ name, description, UserID: '' }),
+				})
+
+				if (!res.ok) throw new Error('Something went wrong while creating a new api app.')
+
+				const data = await res.json()
+				setApiApps((prev) => [...prev, { name: data.name, description: data.description }])
+				setFormData({ name: '', description: '' })
+			} catch (error) {
+				console.log(error)
+			}
 		},
 	})
 
@@ -64,7 +78,7 @@ export default function App() {
 					<h1 className='text-3xl font-bold tracking-tight'>API Apps</h1>
 
 					<Dialog>
-						<DialogTrigger>
+						<DialogTrigger asChild>
 							<Button>Add New</Button>
 						</DialogTrigger>
 
@@ -80,8 +94,8 @@ export default function App() {
 									</Label>
 									<Input
 										id='name'
-										value={name}
-										onChange={(e) => setName(e.target.value)}
+										value={formData.name}
+										onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
 										className='col-span-3'
 									/>
 								</div>
@@ -91,20 +105,24 @@ export default function App() {
 									</Label>
 									<Input
 										id='description'
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
+										value={formData.description}
+										onChange={(e) =>
+											setFormData((prev) => ({ ...prev, description: e.target.value }))
+										}
 										className='col-span-3'
 									/>
 								</div>
 							</div>
 							<DialogFooter>
-								<Button
-									type='submit'
-									onClick={() => addNew({ name, description })}
-									disabled={!name || !description}
-								>
-									Add
-								</Button>
+								<DialogClose asChild>
+									<Button
+										type='submit'
+										onClick={() => addNew({ ...formData })}
+										disabled={!formData.name || !formData.description}
+									>
+										Add
+									</Button>
+								</DialogClose>
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
