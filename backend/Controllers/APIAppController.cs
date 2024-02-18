@@ -47,19 +47,4 @@ public class APIAppController : ControllerBase
 
         return CreatedAtAction(nameof(Get), new { id = newAPIAuthorized.Id }, newAPIAuthorized);
     }
-
-    [HttpDelete("{id:length(24)}")]
-    public async Task<IActionResult> Delete(string id)
-    {
-        var api = await _apiAppService.GetAsync(id);
-
-        if (api is null)
-        {
-            return NotFound();
-        }
-
-        await _apiAppService.RemoveAsync(id);
-
-        return NoContent();
-    }
 }

@@ -20,10 +20,4 @@ public class APIAppService
 
     public async Task CreateAsync(ApiApp newAPI) =>
         await _apisCollection.InsertOneAsync(newAPI);
-
-    public async Task UpdateAsync(string id, ApiApp updatedAPI) =>
-        await _apisCollection.ReplaceOneAsync(x => x.Id == id, updatedAPI);
-
-    public async Task RemoveAsync(string id) =>
-        await _apisCollection.DeleteOneAsync(x => x.Id == id);
 }

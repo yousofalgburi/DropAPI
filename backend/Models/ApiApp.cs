@@ -13,11 +13,14 @@ public class ApiApp
     [BsonElement("Name")]
     public string Name { get; set; } = null!;
 
+    [BsonElement("Identifier")]
+    public string Identifier { get; set; } = null!;
+
     [BsonElement("Description")]
     public string Description { get; set; } = null!;
 
     [BsonElement("IsActive")]
-    public bool IsActive { get; set; } = true;
+    public bool IsActive { get; set; } = false;
 
     // Embedding ApiEndpoints in ApiApp
     [BsonElement("Endpoints")]

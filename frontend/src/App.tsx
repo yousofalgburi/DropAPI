@@ -1,51 +1,65 @@
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { useAuth0 } from '@auth0/auth0-react'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 import APICard from './components/APICard'
 import Navbar from './components/Navbar'
 import { ThemeProvider } from './components/theme-provider'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
+import { APIAppValidator } from './lib/validators/apiapp'
+
+type FormData = z.infer<typeof APIAppValidator>
 
 export default function App() {
 	const { getAccessTokenSilently } = useAuth0()
-
 	const [apiApps, setApiApps] = useState<{ name: string; description: string }[]>([])
-	const [formData, setFormData] = useState({
-		name: '',
-		description: '',
+	const {
+		handleSubmit,
+		register,
+		formState: { errors },
+	} = useForm<FormData>({
+		resolver: zodResolver(APIAppValidator),
+		defaultValues: {
+			name: '',
+			identifier: '',
+			description: '',
+		},
 	})
 
-	const { mutate: addNew } = useMutation({
+	const { mutate: addNew, isPending: isLoading } = useMutation({
 		mutationFn: async ({ name, description }: { name: string; description: string }) => {
 			const token = await getAccessTokenSilently()
 
 			try {
-				const res = await fetch('https://localhost:7115/api/apiapp', {
+				const response = await fetch('https://localhost:7115/api/apiapp', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify({ name, description, UserID: '' }),
+					body: JSON.stringify({ userid: '', name, identifier: '', description }),
 				})
 
-				if (!res.ok) throw new Error('Something went wrong while creating a new api app.')
+				if (!response.ok) throw new Error('Something went wrong while creating a new api app.')
 
-				const data = await res.json()
-				setApiApps((prev) => [...prev, { name: data.name, description: data.description }])
-				setFormData({ name: '', description: '' })
+				const data = await response.json()
+
+				setApiApps((prev) => [
+					...prev,
+					{ name: data.name, identifier: data.identifier, description: data.description },
+				])
 			} catch (error) {
 				console.log(error)
 			}
@@ -75,7 +89,7 @@ export default function App() {
 
 			<main className='container flex flex-col gap-6 py-12'>
 				<div className='flex justify-between'>
-					<h1 className='text-3xl font-bold tracking-tight'>API Apps</h1>
+					<h1 className='text-3xl font-bold tracking-tight'>API Apps ({apiApps.length})</h1>
 
 					<Dialog>
 						<DialogTrigger asChild>
@@ -87,43 +101,38 @@ export default function App() {
 								<DialogTitle>Add New API App</DialogTitle>
 								<DialogDescription>Enter name and description for your new api app.</DialogDescription>
 							</DialogHeader>
-							<div className='grid gap-4 py-4'>
-								<div className='grid grid-cols-4 items-center gap-4'>
-									<Label htmlFor='name' className='text-right'>
-										Name
-									</Label>
-									<Input
-										id='name'
-										value={formData.name}
-										onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-										className='col-span-3'
-									/>
+							<form className='grid gap-4 py-4' onSubmit={handleSubmit((e) => addNew(e))}>
+								<div className='flex flex-col gap-2'>
+									<Label htmlFor='name'>Name</Label>
+									<Input id='name' {...register('name')} className='col-span-3' />
+									{errors?.name && <p className='px-1 text-xs text-red-600'>{errors.name.message}</p>}
 								</div>
-								<div className='grid grid-cols-4 items-center gap-4'>
-									<Label htmlFor='description' className='text-right'>
-										Description
+								<div className='flex flex-col gap-2'>
+									<Label htmlFor='identifier'>Identifier</Label>
+									<Label className='truncate text-sm text-muted-foreground'>
+										This is the URL your API will be hit from.
 									</Label>
-									<Input
-										id='description'
-										value={formData.description}
-										onChange={(e) =>
-											setFormData((prev) => ({ ...prev, description: e.target.value }))
-										}
-										className='col-span-3'
-									/>
+									<Input id='identifier' {...register('identifier')} className='col-span-3' />
+									{errors?.identifier && (
+										<p className='px-1 text-xs text-red-600'>{errors.identifier.message}</p>
+									)}
 								</div>
-							</div>
-							<DialogFooter>
-								<DialogClose asChild>
-									<Button
-										type='submit'
-										onClick={() => addNew({ ...formData })}
-										disabled={!formData.name || !formData.description}
-									>
-										Add
-									</Button>
-								</DialogClose>
-							</DialogFooter>
+								<div className='flex flex-col gap-2'>
+									<Label htmlFor='description'>Description</Label>
+									<Input id='description' {...register('description')} className='col-span-3' />
+									{errors?.description && (
+										<p className='px-1 text-xs text-red-600'>{errors.description.message}</p>
+									)}
+								</div>
+
+								<Button
+									type='submit'
+									disabled={!!errors.name || !!errors.identifier || !!errors.description}
+									isLoading={isLoading}
+								>
+									Add
+								</Button>
+							</form>
 						</DialogContent>
 					</Dialog>
 				</div>
