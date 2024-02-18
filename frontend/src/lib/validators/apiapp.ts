@@ -5,7 +5,7 @@ export const APIAppValidator = z.object({
 		.string()
 		.min(3)
 		.max(32)
-		.regex(/^[a-zA-Z0-9_]+$/),
+		.regex(/^[a-zA-Z0-9_ ]+$/),
 	identifier: z
 		.string()
 		.min(3)
@@ -15,5 +15,5 @@ export const APIAppValidator = z.object({
 		.string()
 		.min(0)
 		.max(128)
-		.regex(/^[a-zA-Z0-9_]+$/),
+		.regex(/^[a-zA-Z0-9_ .]+$/),
 })

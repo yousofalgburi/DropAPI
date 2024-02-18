@@ -1,9 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import { Loader2 } from 'lucide-react'
 import { ModeToggle } from './ModeToggle'
 import { UserAccountNav } from './UserAccountNav'
 
 export default function Navbar() {
-	const { isAuthenticated, user, loginWithRedirect } = useAuth0()
+	const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth0()
 
 	return (
 		<header className='flex h-14 items-center px-4 lg:px-6'>
@@ -18,7 +19,9 @@ export default function Navbar() {
 
 				<ModeToggle />
 
-				{isAuthenticated && user ? (
+				{isLoading ? (
+					<Loader2 className='inline animate-spin' />
+				) : isAuthenticated && user ? (
 					<UserAccountNav
 						user={{
 							name: user.name,

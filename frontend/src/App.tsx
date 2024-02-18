@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/dialog'
 import { useAuth0 } from '@auth0/auth0-react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -18,18 +19,23 @@ import { ThemeProvider } from './components/theme-provider'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
+import { Textarea } from './components/ui/textarea'
+import { Toaster } from './components/ui/toaster'
+import { useToast } from './components/ui/use-toast'
 import { APIAppValidator } from './lib/validators/apiapp'
 
-type FormData = z.infer<typeof APIAppValidator>
+type APIApp = z.infer<typeof APIAppValidator>
 
 export default function App() {
-	const { getAccessTokenSilently } = useAuth0()
-	const [apiApps, setApiApps] = useState<{ name: string; description: string }[]>([])
+	const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0()
+
+	const { toast } = useToast()
+	const [apiApps, setApiApps] = useState<APIApp[]>([])
 	const {
 		handleSubmit,
 		register,
 		formState: { errors },
-	} = useForm<FormData>({
+	} = useForm<APIApp>({
 		resolver: zodResolver(APIAppValidator),
 		defaultValues: {
 			name: '',
@@ -38,50 +44,78 @@ export default function App() {
 		},
 	})
 
-	const { mutate: addNew, isPending: isLoading } = useMutation({
-		mutationFn: async ({ name, description }: { name: string; description: string }) => {
+	async function fetchInitialData() {
+		if (!isAuthenticated) {
+			return []
+		}
+
+		const token = await getAccessTokenSilently()
+
+		const response = await fetch('https://localhost:7115/api/apiapp', {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+
+		const data = (await response.json()) as APIApp[]
+
+		return data
+	}
+
+	const { data } = useQuery({ queryKey: ['apiData'], queryFn: fetchInitialData, enabled: isAuthenticated })
+
+	const { mutate: addNew, isPending: isLoadingNew } = useMutation({
+		mutationFn: async ({
+			name,
+			description,
+			identifier,
+		}: {
+			name: string
+			description: string
+			identifier: string
+		}) => {
 			const token = await getAccessTokenSilently()
 
-			try {
-				const response = await fetch('https://localhost:7115/api/apiapp', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify({ userid: '', name, identifier: '', description }),
-				})
+			const response = await fetch('https://localhost:7115/api/apiapp', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({ userid: '', name, identifier, description }),
+			})
 
-				if (!response.ok) throw new Error('Something went wrong while creating a new api app.')
+			if (!response.ok) {
+				const message = await response.text()
 
-				const data = await response.json()
-
-				setApiApps((prev) => [
-					...prev,
-					{ name: data.name, identifier: data.identifier, description: data.description },
-				])
-			} catch (error) {
-				console.log(error)
+				if (response.status === 400) {
+					throw new Error(message)
+				} else {
+					throw new Error(message)
+				}
 			}
+
+			const data = await response.json()
+
+			setApiApps((prev) => [
+				...prev,
+				{ name: data.name, identifier: data.identifier, description: data.description },
+			])
+		},
+		onError: (error) => {
+			return toast({
+				title: 'Error',
+				description: error.message,
+				variant: 'destructive',
+			})
 		},
 	})
 
 	useEffect(() => {
-		async function fetchData() {
-			const token = await getAccessTokenSilently()
-
-			const response = await fetch('https://localhost:7115/api/apiapp', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-
-			const data = await response.json()
+		if (data) {
 			setApiApps(data)
 		}
-
-		fetchData()
-	}, [getAccessTokenSilently])
+	}, [data])
 
 	return (
 		<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
@@ -89,7 +123,9 @@ export default function App() {
 
 			<main className='container flex flex-col gap-6 py-12'>
 				<div className='flex justify-between'>
-					<h1 className='text-3xl font-bold tracking-tight'>API Apps ({apiApps.length})</h1>
+					<h1 className='text-3xl font-bold tracking-tight'>
+						API Apps ({isLoading ? <Loader2 className='inline animate-spin' /> : apiApps.length})
+					</h1>
 
 					<Dialog>
 						<DialogTrigger asChild>
@@ -119,7 +155,11 @@ export default function App() {
 								</div>
 								<div className='flex flex-col gap-2'>
 									<Label htmlFor='description'>Description</Label>
-									<Input id='description' {...register('description')} className='col-span-3' />
+									<Textarea
+										id='description'
+										{...register('description')}
+										className='col-span-3 max-h-32'
+									/>
 									{errors?.description && (
 										<p className='px-1 text-xs text-red-600'>{errors.description.message}</p>
 									)}
@@ -128,7 +168,7 @@ export default function App() {
 								<Button
 									type='submit'
 									disabled={!!errors.name || !!errors.identifier || !!errors.description}
-									isLoading={isLoading}
+									isLoading={isLoadingNew}
 								>
 									Add
 								</Button>
@@ -138,11 +178,17 @@ export default function App() {
 				</div>
 
 				<div className='flex flex-wrap gap-4'>
-					{apiApps.map((card, index) => (
-						<APICard key={index} apiDetails={card} />
-					))}
+					{isLoading ? (
+						<div className='w-full py-10 flex justify-center'>
+							<Loader2 className='animate-spin' />
+						</div>
+					) : (
+						apiApps.map((card, index) => <APICard key={index} apiDetails={card} />)
+					)}
 				</div>
 			</main>
+
+			<Toaster />
 		</ThemeProvider>
 	)
 }

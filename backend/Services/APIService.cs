@@ -20,4 +20,7 @@ public class APIAppService
 
     public async Task CreateAsync(ApiApp newAPI) =>
         await _apisCollection.InsertOneAsync(newAPI);
+
+    public async Task<bool> CheckIdentifierExistsAsync(string identifier, string userId) =>
+        await _apisCollection.Find(x => x.Identifier == identifier && x.UserId == userId).AnyAsync();
 }

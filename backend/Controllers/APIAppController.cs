@@ -21,7 +21,7 @@ public class APIAppController : ControllerBase
 
         if (string.IsNullOrEmpty(userId))
         {
-            Unauthorized("User ID is required.");
+            Unauthorized("Not authorized.");
             return [];
         }
 
@@ -35,11 +35,22 @@ public class APIAppController : ControllerBase
     public async Task<IActionResult> Post(ApiApp newAPI)
     {
         string userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized("Not authorized.");
+        }
+
+        bool identifierExists = await _apiAppService.CheckIdentifierExistsAsync(newAPI.Identifier, userId);
+        if (identifierExists)
+        {
+            return BadRequest("Identifier already exists.");
+        }
 
         ApiApp newAPIAuthorized = new()
         {
             UserId = userId,
             Name = newAPI.Name,
+            Identifier = newAPI.Identifier,
             Description = newAPI.Description,
         };
 
