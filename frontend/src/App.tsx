@@ -10,7 +10,6 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import APICard from './components/APICard'
@@ -30,7 +29,6 @@ export default function App() {
 	const { isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0()
 
 	const { toast } = useToast()
-	const [apiApps, setApiApps] = useState<APIApp[]>([])
 	const {
 		handleSubmit,
 		register,
@@ -62,7 +60,7 @@ export default function App() {
 		return data
 	}
 
-	const { data } = useQuery({ queryKey: ['apiData'], queryFn: fetchInitialData, enabled: isAuthenticated })
+	const { data: apiApps } = useQuery({ queryKey: ['apiData'], queryFn: fetchInitialData, enabled: isAuthenticated })
 
 	const { mutate: addNew, isPending: isLoadingNew } = useMutation({
 		mutationFn: async ({
@@ -97,10 +95,7 @@ export default function App() {
 
 			const data = await response.json()
 
-			setApiApps((prev) => [
-				...prev,
-				{ name: data.name, identifier: data.identifier, description: data.description },
-			])
+			apiApps && apiApps.push({ name: data.name, identifier: data.identifier, description: data.description })
 		},
 		onError: (error) => {
 			return toast({
@@ -111,12 +106,6 @@ export default function App() {
 		},
 	})
 
-	useEffect(() => {
-		if (data) {
-			setApiApps(data)
-		}
-	}, [data])
-
 	return (
 		<ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
 			<Navbar />
@@ -124,7 +113,7 @@ export default function App() {
 			<main className='container flex flex-col gap-6 py-12'>
 				<div className='flex justify-between'>
 					<h1 className='text-3xl font-bold tracking-tight'>
-						API Apps ({isLoading ? <Loader2 className='inline animate-spin' /> : apiApps.length})
+						API Apps ({isLoading ? <Loader2 className='inline animate-spin' /> : apiApps && apiApps.length})
 					</h1>
 
 					<Dialog>
@@ -183,7 +172,7 @@ export default function App() {
 							<Loader2 className='animate-spin' />
 						</div>
 					) : (
-						apiApps.map((card, index) => <APICard key={index} apiDetails={card} />)
+						apiApps && apiApps.map((card, index) => <APICard key={index} apiDetails={card} />)
 					)}
 				</div>
 			</main>
