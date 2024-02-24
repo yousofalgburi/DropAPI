@@ -21,6 +21,7 @@ import { Label } from './components/ui/label'
 import { Textarea } from './components/ui/textarea'
 import { Toaster } from './components/ui/toaster'
 import { useToast } from './components/ui/use-toast'
+import { api } from './lib/constants'
 import { APIAppValidator } from './lib/validators/apiapp'
 
 type APIApp = z.infer<typeof APIAppValidator>
@@ -49,7 +50,7 @@ export default function App() {
 
 		const token = await getAccessTokenSilently()
 
-		const response = await fetch('https://localhost:7115/api/apiapp', {
+		const response = await fetch(`${api}/api/apiapp`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -74,7 +75,7 @@ export default function App() {
 		}) => {
 			const token = await getAccessTokenSilently()
 
-			const response = await fetch('https://localhost:7115/api/apiapp', {
+			const response = await fetch(`${api}/api/apiapp`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -85,12 +86,7 @@ export default function App() {
 
 			if (!response.ok) {
 				const message = await response.text()
-
-				if (response.status === 400) {
-					throw new Error(message)
-				} else {
-					throw new Error(message)
-				}
+				throw new Error(message)
 			}
 
 			const data = await response.json()
