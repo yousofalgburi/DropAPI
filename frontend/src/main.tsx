@@ -4,6 +4,9 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
+import AppEdit from './components/AppEdit.tsx'
+import { AuthProvider } from './components/AuthProvider.tsx'
+import HomeFeed from './components/HomeFeed.tsx'
 import './global.css'
 
 const queryClient = new QueryClient()
@@ -12,6 +15,16 @@ const router = createBrowserRouter([
 	{
 		path: '/',
 		element: <App />,
+		children: [
+			{
+				path: '/',
+				element: <HomeFeed />,
+			},
+			{
+				path: '/app/edit/:id',
+				element: <AppEdit />,
+			},
+		],
 	},
 ])
 
@@ -27,7 +40,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 			}}
 		>
 			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+				<AuthProvider>
+					<RouterProvider router={router} />
+				</AuthProvider>
 			</QueryClientProvider>
 		</Auth0Provider>
 	</React.StrictMode>

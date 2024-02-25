@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function APICard({
@@ -15,7 +15,9 @@ export default function APICard({
 			</CardHeader>
 
 			<CardFooter className='flex justify-end'>
-				<Button>View</Button>
+				<a href={`/app/edit/${apiDetails.identifier}`} className={buttonVariants()}>
+					View
+				</a>
 			</CardFooter>
 		</Card>
 	)
