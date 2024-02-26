@@ -1,19 +1,56 @@
-import { useCallback } from 'react'
-import ReactFlow, { Background, Controls, MiniMap, addEdge, useEdgesState, useNodesState } from 'reactflow'
-import 'reactflow/dist/style.css'
+import { useCallback, useState } from 'react'
+import ReactFlow, {
+	Background,
+	BackgroundVariant,
+	Controls,
+	DefaultEdgeOptions,
+	Edge,
+	FitViewOptions,
+	MiniMap,
+	Node,
+	NodeTypes,
+	OnConnect,
+	OnEdgesChange,
+	OnNodesChange,
+	addEdge,
+	applyEdgeChanges,
+	applyNodeChanges,
+} from 'reactflow'
 
-const initialNodes = [
-	{ id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
-	{ id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
+import CustomNode from './CustomNode'
+
+const initialNodes: Node[] = [
+	{ id: '1', data: { label: 'Node 1' }, position: { x: 5, y: 5 } },
+	{ id: '2', data: { label: 'Node 2' }, position: { x: 5, y: 100 } },
 ]
 
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }]
+const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }]
+
+const fitViewOptions: FitViewOptions = {
+	padding: 0.2,
+}
+
+const defaultEdgeOptions: DefaultEdgeOptions = {
+	animated: true,
+}
+
+const nodeTypes: NodeTypes = {
+	custom: CustomNode,
+}
 
 export default function AppEdit() {
-	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+	const [nodes, setNodes] = useState<Node[]>(initialNodes)
+	const [edges, setEdges] = useState<Edge[]>(initialEdges)
 
-	const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges])
+	const onNodesChange: OnNodesChange = useCallback(
+		(changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+		[setNodes]
+	)
+	const onEdgesChange: OnEdgesChange = useCallback(
+		(changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+		[setEdges]
+	)
+	const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges])
 
 	return (
 		<div className='grid h-full min-h-[85vh] items-stretch gap-6 md:grid-cols-[1fr_4fr]'>
@@ -28,10 +65,14 @@ export default function AppEdit() {
 					onNodesChange={onNodesChange}
 					onEdgesChange={onEdgesChange}
 					onConnect={onConnect}
+					fitView
+					fitViewOptions={fitViewOptions}
+					defaultEdgeOptions={defaultEdgeOptions}
+					nodeTypes={nodeTypes}
 				>
 					<Controls />
 					<MiniMap />
-					<Background variant='dots' gap={12} size={1} />
+					<Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 				</ReactFlow>
 			</div>
 		</div>

@@ -21,7 +21,6 @@ public class APIAppController : ControllerBase
 
         if (string.IsNullOrEmpty(userId))
         {
-            Unauthorized("Not authorized.");
             return [];
         }
 
