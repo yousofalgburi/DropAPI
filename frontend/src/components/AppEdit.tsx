@@ -1,56 +1,26 @@
-import { useCallback, useState } from 'react'
-import ReactFlow, {
-	Background,
-	BackgroundVariant,
-	Controls,
-	DefaultEdgeOptions,
-	Edge,
-	FitViewOptions,
-	MiniMap,
-	Node,
-	NodeTypes,
-	OnConnect,
-	OnEdgesChange,
-	OnNodesChange,
-	addEdge,
-	applyEdgeChanges,
-	applyNodeChanges,
-} from 'reactflow'
+import ReactFlow, { Background, BackgroundVariant, Controls, MiniMap } from 'reactflow'
 
-import CustomNode from './CustomNode'
+import 'reactflow/dist/style.css'
 
-const initialNodes: Node[] = [
-	{ id: '1', data: { label: 'Node 1' }, position: { x: 5, y: 5 } },
-	{ id: '2', data: { label: 'Node 2' }, position: { x: 5, y: 100 } },
-]
+import { useStore } from '@/lib/NodeEditorStore'
+import { shallow } from 'zustand/shallow'
+import Data from './Nodes/Data'
 
-const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }]
+// @ts-expect-error TODO: fix this
+const selector = (store) => ({
+	nodes: store.nodes,
+	edges: store.edges,
+	onNodesChange: store.onNodesChange,
+	onEdgesChange: store.onEdgesChange,
+	addEdge: store.addEdge,
+})
 
-const fitViewOptions: FitViewOptions = {
-	padding: 0.2,
-}
-
-const defaultEdgeOptions: DefaultEdgeOptions = {
-	animated: true,
-}
-
-const nodeTypes: NodeTypes = {
-	custom: CustomNode,
+const nodeTypes = {
+	data: Data,
 }
 
 export default function AppEdit() {
-	const [nodes, setNodes] = useState<Node[]>(initialNodes)
-	const [edges, setEdges] = useState<Edge[]>(initialEdges)
-
-	const onNodesChange: OnNodesChange = useCallback(
-		(changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-		[setNodes]
-	)
-	const onEdgesChange: OnEdgesChange = useCallback(
-		(changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-		[setEdges]
-	)
-	const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges])
+	const store = useStore(selector, shallow)
 
 	return (
 		<div className='grid h-full min-h-[85vh] items-stretch gap-6 md:grid-cols-[1fr_4fr]'>
@@ -60,15 +30,13 @@ export default function AppEdit() {
 
 			<div className='w-full h-full rounded-md bg-white'>
 				<ReactFlow
-					nodes={nodes}
-					edges={edges}
-					onNodesChange={onNodesChange}
-					onEdgesChange={onEdgesChange}
-					onConnect={onConnect}
-					fitView
-					fitViewOptions={fitViewOptions}
-					defaultEdgeOptions={defaultEdgeOptions}
+					nodes={store.nodes}
 					nodeTypes={nodeTypes}
+					edges={store.edges}
+					onNodesChange={store.onNodesChange}
+					onEdgesChange={store.onEdgesChange}
+					onConnect={store.addEdge}
+					deleteKeyCode='Delete'
 				>
 					<Controls />
 					<MiniMap />
