@@ -1,11 +1,15 @@
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default function APICard({
-	apiDetails,
-}: {
-	apiDetails: { name: string; description: string; identifier: string }
-}) {
+interface APICardProps {
+	apiDetails: {
+		name: string
+		description: string
+		identifier: string
+	}
+}
+
+export default function APICard({ apiDetails }: APICardProps) {
 	return (
 		<Card className='w-[350px] flex-grow'>
 			<CardHeader>

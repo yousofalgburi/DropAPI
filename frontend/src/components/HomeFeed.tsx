@@ -4,16 +4,14 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
+	DialogTrigger
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import APICard from '../components/APICard'
-import { AuthProviderContext } from '../components/AuthProvider'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -21,38 +19,35 @@ import { Textarea } from '../components/ui/textarea'
 import { useToast } from '../components/ui/use-toast'
 import { api } from '../lib/constants'
 
+import { ClerkLoaded, ClerkLoading, useAuth } from '@clerk/clerk-react'
 import { APIAppValidator } from '../lib/validators/apiapp'
 
 type APIApp = z.infer<typeof APIAppValidator>
 
 export default function HomeFeed() {
-	const { isLoading, isAuthenticated, getAccessTokenSilently } = useContext(AuthProviderContext)
+	const { getToken, isSignedIn, isLoaded } = useAuth()
 
 	const { toast } = useToast()
 	const {
 		handleSubmit,
 		register,
-		formState: { errors },
+		formState: { errors }
 	} = useForm<APIApp>({
 		resolver: zodResolver(APIAppValidator),
 		defaultValues: {
 			name: '',
 			identifier: '',
-			description: '',
-		},
+			description: ''
+		}
 	})
 
 	async function fetchInitialData() {
-		if (!isAuthenticated) {
-			return []
-		}
-
-		const token = await getAccessTokenSilently()
+		if (!isSignedIn) return []
 
 		const response = await fetch(`${api}/api/apiapp`, {
 			headers: {
-				Authorization: `Bearer ${token}`,
-			},
+				Authorization: `Bearer ${await getToken()}`
+			}
 		})
 
 		const data = (await response.json()) as APIApp[]
@@ -60,27 +55,30 @@ export default function HomeFeed() {
 		return data
 	}
 
-	const { data: apiApps } = useQuery({ queryKey: ['apiData'], queryFn: fetchInitialData, enabled: isAuthenticated })
+	const { data: apiApps } = useQuery({
+		queryKey: ['apiData'],
+		queryFn: fetchInitialData,
+		enabled: isLoaded,
+		initialData: []
+	})
 
 	const { mutate: addNew, isPending: isLoadingNew } = useMutation({
 		mutationFn: async ({
 			name,
 			description,
-			identifier,
+			identifier
 		}: {
 			name: string
 			description: string
 			identifier: string
 		}) => {
-			const token = await getAccessTokenSilently()
-
 			const response = await fetch(`${api}/api/apiapp`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
+					Authorization: `Bearer ${await getToken()}`
 				},
-				body: JSON.stringify({ userid: '', name, identifier, description }),
+				body: JSON.stringify({ userid: '', name, identifier, description })
 			})
 
 			if (!response.ok) {
@@ -90,27 +88,33 @@ export default function HomeFeed() {
 
 			const data = await response.json()
 
-			apiApps && apiApps.push({ name: data.name, identifier: data.identifier, description: data.description })
+			apiApps.push({ name: data.name, identifier: data.identifier, description: data.description })
 		},
 		onError: (error) => {
 			return toast({
 				title: 'Error',
 				description: error.message,
-				variant: 'destructive',
+				variant: 'destructive'
 			})
-		},
+		}
 	})
 
 	return (
 		<>
 			<div className='flex justify-between'>
 				<h1 className='text-3xl font-bold tracking-tight'>
-					API Apps ({isLoading ? <Loader2 className='inline animate-spin' /> : apiApps && apiApps.length})
+					API Apps (
+					{
+						<ClerkLoading>
+							<Loader2 className='inline animate-spin' />
+						</ClerkLoading>
+					}
+					<ClerkLoaded>{apiApps.length}</ClerkLoaded>)
 				</h1>
 
 				<Dialog>
 					<DialogTrigger asChild>
-						<Button>Add New</Button>
+						<Button disabled={!isLoaded}>Add New</Button>
 					</DialogTrigger>
 
 					<DialogContent>
@@ -130,20 +134,12 @@ export default function HomeFeed() {
 									This is the URL your API will be hit from.
 								</Label>
 								<Input id='identifier' {...register('identifier')} className='col-span-3' />
-								{errors?.identifier && (
-									<p className='px-1 text-xs text-red-600'>{errors.identifier.message}</p>
-								)}
+								{errors?.identifier && <p className='px-1 text-xs text-red-600'>{errors.identifier.message}</p>}
 							</div>
 							<div className='flex flex-col gap-2'>
 								<Label htmlFor='description'>Description</Label>
-								<Textarea
-									id='description'
-									{...register('description')}
-									className='col-span-3 max-h-32'
-								/>
-								{errors?.description && (
-									<p className='px-1 text-xs text-red-600'>{errors.description.message}</p>
-								)}
+								<Textarea id='description' {...register('description')} className='col-span-3 max-h-32' />
+								{errors?.description && <p className='px-1 text-xs text-red-600'>{errors.description.message}</p>}
 							</div>
 
 							<Button
@@ -159,13 +155,17 @@ export default function HomeFeed() {
 			</div>
 
 			<div className='flex flex-wrap gap-4'>
-				{isLoading ? (
+				<ClerkLoading>
 					<div className='w-full py-10 flex justify-center'>
 						<Loader2 className='animate-spin' />
 					</div>
-				) : (
-					apiApps && apiApps.map((card, index) => <APICard key={index} apiDetails={card} />)
-				)}
+				</ClerkLoading>
+
+				<ClerkLoaded>
+					{apiApps.map((card, index) => (
+						<APICard key={index} apiDetails={card} />
+					))}
+				</ClerkLoaded>
 			</div>
 		</>
 	)

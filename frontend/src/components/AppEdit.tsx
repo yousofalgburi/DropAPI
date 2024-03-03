@@ -2,9 +2,9 @@ import ReactFlow, { Background, BackgroundVariant, Controls, MiniMap } from 'rea
 
 import 'reactflow/dist/style.css'
 
-import { useStore } from '@/lib/NodeEditorStore'
+import { useStore } from '@/lib/store/NodeEditorStore'
 import { shallow } from 'zustand/shallow'
-import Data from './Nodes/Data'
+import Data from './nodes/Data'
 
 // @ts-expect-error TODO: fix this
 const selector = (store) => ({
@@ -12,11 +12,11 @@ const selector = (store) => ({
 	edges: store.edges,
 	onNodesChange: store.onNodesChange,
 	onEdgesChange: store.onEdgesChange,
-	addEdge: store.addEdge,
+	addEdge: store.addEdge
 })
 
 const nodeTypes = {
-	data: Data,
+	data: Data
 }
 
 export default function AppEdit() {

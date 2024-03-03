@@ -1,0 +1,26 @@
+{
+	"name": "dropapi-backend",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.ts",
+	"scripts": {
+		"dev": "node --loader ts-node/esm server.ts"
+	},
+	"type": "module",
+	"keywords": [],
+	"author": "Yousof Algburi",
+	"license": "ISC",
+	"dependencies": {
+		"fastify": "^4.26.1",
+		"jsonwebtoken": "^9.0.2"
+	},
+	"devDependencies": {
+		"@types/jsonwebtoken": "^9.0.6",
+		"@types/node": "^20.11.24",
+		"@typescript-eslint/eslint-plugin": "^7.1.0",
+		"@typescript-eslint/parser": "^7.1.0",
+		"eslint": "^8.57.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.3.3"
+	}
+}

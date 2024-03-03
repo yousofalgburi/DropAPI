@@ -1,14 +1,14 @@
 import { Handle, Position } from 'reactflow'
 import { shallow } from 'zustand/shallow'
 
-import { useStore } from '@/lib/NodeEditorStore'
+import { useStore } from '@/lib/store/NodeEditorStore'
 
 // @ts-expect-error TODO: fix this
 const selector = (id) => (store) => ({
 	// @ts-expect-error TODO: fix this
 	setFrequency: (e) => store.updateNode(id, { frequency: +e.target.value }),
 	// @ts-expect-error TODO: fix this
-	setType: (e) => store.updateNode(id, { type: e.target.value }),
+	setType: (e) => store.updateNode(id, { type: e.target.value })
 })
 
 // @ts-expect-error TODO: fix this

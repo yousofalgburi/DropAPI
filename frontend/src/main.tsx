@@ -1,11 +1,10 @@
-import { Auth0Provider } from '@auth0/auth0-react'
+import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import AppEdit from './components/AppEdit.tsx'
-import { AuthProvider } from './components/AuthProvider.tsx'
 import HomeFeed from './components/HomeFeed.tsx'
 import './global.css'
 
@@ -18,32 +17,28 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <HomeFeed />,
+				element: <HomeFeed />
 			},
 			{
 				path: '/app/edit/:id',
-				element: <AppEdit />,
-			},
-		],
-	},
+				element: <AppEdit />
+			}
+		]
+	}
 ])
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+	throw new Error('Missing Publishable Key')
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
-		<Auth0Provider
-			domain={`${import.meta.env.VITE_AUTH0_DOMAIN}`}
-			clientId={`${import.meta.env.VITE_AUTH0_CLIENT_ID}`}
-			authorizationParams={{
-				redirect_uri: window.location.origin,
-				audience: 'https://localhost:7115/',
-				scope: 'openid profile email read:apiapp write:apiapp',
-			}}
-		>
+		<ClerkProvider publishableKey={PUBLISHABLE_KEY}>
 			<QueryClientProvider client={queryClient}>
-				<AuthProvider>
-					<RouterProvider router={router} />
-				</AuthProvider>
+				<RouterProvider router={router} />
 			</QueryClientProvider>
-		</Auth0Provider>
+		</ClerkProvider>
 	</React.StrictMode>
 )
