@@ -1,0 +1,6 @@
+{
+	"databaseURL": "https://Yousof-Algburi-s-workspace-4iv5up.us-east-1.xata.sh/db/dropapi",
+	"codegen": {
+		"output": "src/lib/xata.ts"
+	}
+}

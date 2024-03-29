@@ -2,23 +2,28 @@
 	"name": "dropapi-backend",
 	"version": "1.0.0",
 	"description": "",
-	"main": "server.ts",
+	"main": "dist/server.js",
 	"scripts": {
-		"dev": "node --loader ts-node/esm server.ts"
+		"dev": "nodemon --watch src src/server.ts",
+		"build": "tsc -p tsconfig.json"
 	},
-	"type": "module",
 	"keywords": [],
 	"author": "Yousof Algburi",
 	"license": "ISC",
 	"dependencies": {
+		"@xata.io/client": "0.0.0-next.v34f1d64a4f4c1ffd896bbb285ab38efd8315b259",
+		"dotenv": "^16.4.5",
+		"drizzle-orm": "^0.30.6",
 		"fastify": "^4.26.1",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"pg": "^8.11.3"
 	},
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/node": "^20.11.24",
 		"@typescript-eslint/eslint-plugin": "^7.1.0",
 		"@typescript-eslint/parser": "^7.1.0",
+		"drizzle-kit": "^0.20.14",
 		"eslint": "^8.57.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.3.3"
