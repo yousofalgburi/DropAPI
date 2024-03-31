@@ -1,7 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { getXataClient } from './xata'
+import 'dotenv/config'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import postgres from 'postgres'
 
-const xata = getXataClient()
-const db = drizzle(xata)
+const queryClient = postgres(process.env.DATABASE_URL!)
+const db = drizzle(queryClient)
 
 export default db

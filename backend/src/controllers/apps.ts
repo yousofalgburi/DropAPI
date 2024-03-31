@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { appsService } from '../service/apps.service'
+import { appsService } from '../service/apps'
 
 interface bodyInterface {
 	name: string

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
-import { verifyToken } from '../service/auth.service'
+import { verifyToken } from '../service/auth'
 
 export function authMiddleware(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction) {
 	const token = request.headers.authorization
