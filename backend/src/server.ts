@@ -1,12 +1,12 @@
+import 'dotenv/config'
 import Fastify from 'fastify'
-import dotenv from 'dotenv'
 import { userRoutes } from './routes/user'
-
-dotenv.config()
+import { appsRoutes } from './routes/apps'
 
 const server = Fastify()
 
 server.register(userRoutes)
+server.register(appsRoutes)
 
 const start = async () => {
 	try {

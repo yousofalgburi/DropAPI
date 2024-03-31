@@ -1,18 +1,24 @@
 import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify'
-import { verifyToken } from '../service/auth'
+import jwt from 'jsonwebtoken'
+const secret = process.env.SECRET!
 
-export function authMiddleware(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction) {
-	const token = request.headers.authorization
-
-	if (!token) {
-		reply.status(401).send({ error: 'No token provided' })
-		return
-	}
+export default function auth(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction) {
+	const token = request.headers.authorization?.split(' ')[1]
 
 	try {
-		verifyToken(token)
+		if (token !== undefined) {
+			const decodedData = jwt.verify(token, secret)
+
+			if (!decodedData) {
+				return reply.status(401).send({ error: 'Invalid token' })
+			}
+		} else {
+			return reply.status(401).send({ error: 'Invalid token' })
+		}
+
 		done()
 	} catch (error) {
-		reply.status(401).send({ error: 'Invalid token' })
+		console.log(error)
+		return reply.status(401).send({ error: 'Invalid token' })
 	}
 }

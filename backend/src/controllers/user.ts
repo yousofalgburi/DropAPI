@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { UserSignInRequest, UserSignUpRequest } from '../types/user'
 
-const secret = process.env.SECERT || 'test'
+const secret = process.env.SECRET!
 
 export async function SignIn(request: FastifyRequest, reply: FastifyReply) {
 	const { email, password } = request.body as UserSignInRequest
