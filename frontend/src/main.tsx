@@ -1,4 +1,3 @@
-import { ClerkProvider } from '@clerk/clerk-react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -7,6 +6,9 @@ import App from './App.tsx'
 import AppEdit from './components/AppEdit.tsx'
 import HomeFeed from './components/HomeFeed.tsx'
 import './global.css'
+import { SignIn } from './components/SignIn.tsx'
+import { SignUp } from './components/SignUp.tsx'
+import { ForgotPassword } from './components/ForgotPassword.tsx'
 
 const queryClient = new QueryClient()
 
@@ -22,6 +24,18 @@ const router = createBrowserRouter([
 			{
 				path: '/app/edit/:id',
 				element: <AppEdit />
+			},
+			{
+				path: '/auth/signin',
+				element: <SignIn />
+			},
+			{
+				path: '/auth/signup',
+				element: <SignUp />
+			},
+			{
+				path: '/auth/forgot-password',
+				element: <ForgotPassword />
 			}
 		]
 	}
@@ -35,10 +49,8 @@ if (!PUBLISHABLE_KEY) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
-		<ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
-			</QueryClientProvider>
-		</ClerkProvider>
+		<QueryClientProvider client={queryClient}>
+			<RouterProvider router={router} />
+		</QueryClientProvider>
 	</React.StrictMode>
 )

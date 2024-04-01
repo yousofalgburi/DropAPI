@@ -1,6 +1,5 @@
-import { ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
-import { Loader2 } from 'lucide-react'
 import { ModeToggle } from './ModeToggle'
+import { buttonVariants } from './ui/button'
 
 export default function Navbar() {
 	return (
@@ -16,17 +15,9 @@ export default function Navbar() {
 
 				<ModeToggle />
 
-				<ClerkLoading>
-					<Loader2 className='inline animate-spin' />
-				</ClerkLoading>
-
-				<SignedOut>
-					<SignInButton />
-				</SignedOut>
-
-				<SignedIn>
-					<UserButton afterSignOutUrl='/' />
-				</SignedIn>
+				<a href='/auth/signin' className={buttonVariants()}>
+					Sign In
+				</a>
 			</nav>
 		</header>
 	)

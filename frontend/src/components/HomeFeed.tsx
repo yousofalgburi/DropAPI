@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import APICard from '../components/APICard'
@@ -18,15 +17,11 @@ import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
 import { useToast } from '../components/ui/use-toast'
 import { api } from '../lib/constants'
-
-import { ClerkLoaded, ClerkLoading, useAuth } from '@clerk/clerk-react'
 import { APIAppValidator } from '../lib/validators/apiapp'
 
 type APIApp = z.infer<typeof APIAppValidator>
 
 export default function HomeFeed() {
-	const { getToken, isSignedIn, isLoaded } = useAuth()
-
 	const { toast } = useToast()
 	const {
 		handleSubmit,
@@ -42,11 +37,9 @@ export default function HomeFeed() {
 	})
 
 	async function fetchInitialData() {
-		if (!isSignedIn) return []
-
 		const response = await fetch(`${api}/api/apiapp`, {
 			headers: {
-				Authorization: `Bearer ${await getToken()}`
+				Authorization: `Bearer ${123}`
 			}
 		})
 
@@ -58,7 +51,6 @@ export default function HomeFeed() {
 	const { data: apiApps } = useQuery({
 		queryKey: ['apiData'],
 		queryFn: fetchInitialData,
-		enabled: isLoaded,
 		initialData: []
 	})
 
@@ -76,7 +68,7 @@ export default function HomeFeed() {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${await getToken()}`
+					Authorization: `Bearer ${123}`
 				},
 				body: JSON.stringify({ userid: '', name, identifier, description })
 			})
@@ -102,19 +94,11 @@ export default function HomeFeed() {
 	return (
 		<>
 			<div className='flex justify-between'>
-				<h1 className='text-3xl font-bold tracking-tight'>
-					API Apps (
-					{
-						<ClerkLoading>
-							<Loader2 className='inline animate-spin' />
-						</ClerkLoading>
-					}
-					<ClerkLoaded>{apiApps.length}</ClerkLoaded>)
-				</h1>
+				<h1 className='text-3xl font-bold tracking-tight'>API Apps ({apiApps.length})</h1>
 
 				<Dialog>
 					<DialogTrigger asChild>
-						<Button disabled={!isLoaded}>Add New</Button>
+						<Button>Add New</Button>
 					</DialogTrigger>
 
 					<DialogContent>
@@ -155,17 +139,9 @@ export default function HomeFeed() {
 			</div>
 
 			<div className='flex flex-wrap gap-4'>
-				<ClerkLoading>
-					<div className='w-full py-10 flex justify-center'>
-						<Loader2 className='animate-spin' />
-					</div>
-				</ClerkLoading>
-
-				<ClerkLoaded>
-					{apiApps.map((card, index) => (
-						<APICard key={index} apiDetails={card} />
-					))}
-				</ClerkLoaded>
+				{apiApps.map((card, index) => (
+					<APICard key={index} apiDetails={card} />
+				))}
 			</div>
 		</>
 	)
