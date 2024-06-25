@@ -292,7 +292,7 @@ export default function App() {
 										<span className='text-sm font-normal'>/month</span>
 									</p>
 									<ul className='mb-6 flex-grow'>
-										{plan.features.map((feature, i) => (
+										{plan.features.map((feature) => (
 											<li key={feature} className='flex items-center mb-2'>
 												<ArrowRight className='w-4 h-4 mr-2 text-green-500' />
 												<span>{feature}</span>
