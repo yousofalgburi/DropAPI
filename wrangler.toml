@@ -1,3 +1,0 @@
-name = "dropapi"
-main = "server/index.ts"
-compatibility_date = "2024-06-20"
