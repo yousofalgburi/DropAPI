@@ -7,9 +7,9 @@ WORKDIR /app
 
 COPY package*json tsconfig.json src ./
 
-RUN pnpm ci && \
+RUN pnpm install --frozen-lockfile && \
     pnpm run build && \
-    pnpm prune --production
+    pnpm prune --prod
 
 FROM base AS runner
 WORKDIR /app
