@@ -5,6 +5,8 @@ FROM base AS builder
 RUN apk add --no-cache gcompat
 WORKDIR /app
 
+RUN npm install -g pnpm
+
 COPY package*json tsconfig.json src ./
 
 RUN pnpm install --frozen-lockfile && \
