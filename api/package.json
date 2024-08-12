@@ -1,19 +1,21 @@
 {
-  "name": "api",
-  "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc"
-  },
-  "dependencies": {
-    "@hono/node-server": "^1.12.0",
-    "hono": "^4.5.5",
-    "postgres": "^3.4.4",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.15",
-    "tsx": "^4.17.0",
-    "typescript": "^5.5.4"
-  },
-  "type": "module"
+	"name": "api",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc",
+		"migrate": "tsx db/migrate.ts"
+	},
+	"dependencies": {
+		"@hono/node-server": "^1.12.0",
+		"dotenv": "^16.4.5",
+		"hono": "^4.5.5",
+		"postgres": "^3.4.4",
+		"zod": "^3.23.8"
+	},
+	"devDependencies": {
+		"@types/node": "^20.14.15",
+		"tsx": "^4.17.0",
+		"typescript": "^5.5.4"
+	},
+	"type": "module"
 }
