@@ -1,53 +1,11 @@
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-
-function MountainIcon(props: React.SVGProps<SVGSVGElement>) {
-	return (
-		<svg
-			{...props}
-			xmlns='http://www.w3.org/2000/svg'
-			width='24'
-			height='24'
-			viewBox='0 0 24 24'
-			fill='none'
-			stroke='currentColor'
-			strokeWidth='2'
-			strokeLinecap='round'
-			strokeLinejoin='round'
-		>
-			<title>DropAPI</title>
-			<path d='m8 3 4 8 5-5 5 15H2L8 3z' />
-		</svg>
-	)
-}
+import { Button, buttonVariants } from '@/components/ui/button'
+import Image from 'next/image'
 
 export default function Home() {
 	return (
 		<div className='flex flex-col min-h-[100dvh]'>
-			<header className='bg-background px-4 lg:px-6 h-14 flex items-center'>
-				<Link href='#' className='flex items-center justify-center' prefetch={false}>
-					<MountainIcon className='h-6 w-6' />
-					<span className='sr-only'>DropAPI</span>
-				</Link>
-				<nav className='ml-auto flex gap-4 sm:gap-6 items-center'>
-					<Link href='#' className='text-sm font-medium hover:underline underline-offset-4' prefetch={false}>
-						Features
-					</Link>
-					<Link href='#' className='text-sm font-medium hover:underline underline-offset-4' prefetch={false}>
-						Pricing
-					</Link>
-					<Link href='#' className='text-sm font-medium hover:underline underline-offset-4' prefetch={false}>
-						Documentation
-					</Link>
-					<Link href='#' className='text-sm font-medium hover:underline underline-offset-4' prefetch={false}>
-						Contact
-					</Link>
-					<Button variant='outline' className='px-3 py-1 rounded-md text-sm font-medium'>
-						Sign In
-					</Button>
-				</nav>
-			</header>
 			<main className='flex-1'>
 				<section className='w-full py-12 md:py-24 lg:py-32 xl:py-48'>
 					<div className='container px-4 md:px-6'>
@@ -66,27 +24,27 @@ export default function Home() {
 								</div>
 								<div className='flex flex-col gap-2 min-[400px]:flex-row'>
 									<Link
-										href='#'
+										href='/auth'
 										className='inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
 										prefetch={false}
 									>
 										Get Started
 									</Link>
-									<Link
+									{/* <Link
 										href='#'
 										className='inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
 										prefetch={false}
 									>
 										Learn More
-									</Link>
+									</Link> */}
 								</div>
 							</div>
-							<img
-								src='https://generated.vusercontent.net/placeholder.svg'
-								width='600'
-								height='600'
+							<Image
+								src='https://images.unsplash.com/photo-1502085671122-2d218cd434e6?q=80&w=2452&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+								width={1920}
+								height={1080}
 								alt='Hero'
-								className='mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last lg:aspect-square'
+								className='mx-auto aspect-video rounded-xl overflow-hidden object-cover sm:w-full lg:order-last lg:aspect-square'
 							/>
 						</div>
 					</div>
@@ -144,7 +102,7 @@ export default function Home() {
 								</ul>
 							</div>
 							<img
-								src='https://generated.vusercontent.net/placeholder.svg'
+								src='https://images.unsplash.com/photo-1507513319174-e556268bb244?q=80&w=2558&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
 								width='550'
 								height='310'
 								alt='placeholder'
@@ -164,19 +122,19 @@ export default function Home() {
 						</div>
 						<div className='flex flex-col gap-2 min-[400px]:flex-row lg:justify-end'>
 							<Link
-								href='#'
+								href='/auth'
 								className='inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
 								prefetch={false}
 							>
 								Get Started
 							</Link>
-							<Link
+							{/* <Link
 								href='#'
 								className='inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
 								prefetch={false}
 							>
 								Learn More
-							</Link>
+							</Link> */}
 						</div>
 					</div>
 				</section>
@@ -191,11 +149,13 @@ export default function Home() {
 						<div className='mx-auto w-full max-w-sm space-y-2'>
 							<form className='flex gap-2'>
 								<Input type='email' placeholder='Enter your email' className='max-w-lg flex-1' />
-								<Button type='submit'>Sign Up</Button>
+								<Link href='/auth' className={buttonVariants({ variant: 'default' })} type='submit'>
+									Sign Up
+								</Link>
 							</form>
 							<p className='text-xs text-muted-foreground'>
 								By signing up, you agree to our{' '}
-								<Link href='#' className='underline underline-offset-2' prefetch={false}>
+								<Link href='/terms' className='underline underline-offset-2' prefetch={false}>
 									Terms &amp; Conditions
 								</Link>
 							</p>
@@ -203,17 +163,6 @@ export default function Home() {
 					</div>
 				</section>
 			</main>
-			<footer className='flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t'>
-				<p className='text-xs text-muted-foreground'>&copy; 2024 DropAPI. All rights reserved.</p>
-				<nav className='sm:ml-auto flex gap-4 sm:gap-6'>
-					<Link href='#' className='text-xs hover:underline underline-offset-4' prefetch={false}>
-						Terms of Service
-					</Link>
-					<Link href='#' className='text-xs hover:underline underline-offset-4' prefetch={false}>
-						Privacy
-					</Link>
-				</nav>
-			</footer>
 		</div>
 	)
 }

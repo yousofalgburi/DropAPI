@@ -5,6 +5,10 @@ import { Space_Mono } from 'next/font/google'
 import { cn } from '@/lib/utils'
 
 import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
+import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
 	title: 'DropAPI',
@@ -30,8 +34,18 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<html lang='en'>
-			<body className={cn('antialiased', fontHeading.variable, fontBody.variable)}>{children}</body>
+		<html lang='en' suppressHydrationWarning>
+			<body className={cn('antialiased', fontHeading.variable, fontBody.variable)}>
+				<ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+					<div className='flex flex-col min-h-[100dvh]'>
+						<Navbar />
+						{children}
+						<Footer />
+					</div>
+				</ThemeProvider>
+			</body>
+
+			<Toaster richColors />
 		</html>
 	)
 }
